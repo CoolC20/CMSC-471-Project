@@ -389,14 +389,16 @@ After further research into solving Connect Four using a minimax algorithm, ther
 \IEEEpeerreviewmaketitle
 
 
-
 \section{Findings on the Nature of Connect Four}
 % no \IEEEPARstart
 The specifics of Connect Four were given in our first report, but we would
 like to describe the game more in terms of game theory. The existence of a
 perfect solution given a certain game state (an empty board) will also be
 explored as well as approximations into the number of possible game states
-and other interesting statistics.
+and other interesting statistics. We have also included more formal definitions
+of the algorithms and structures that we may use in the implementation of
+a Connect Four solver.
+
 
 \subsection{Connect Four and Game Theory}
 Connect Four is a game in which two players alternate in placing disks in one of seven columns
@@ -407,10 +409,12 @@ Players must place a disk when it is their turn unless the game board is full. I
 is full and no player has lined up four disks consecutively in any winning configuration, the game
 is a draw. 
 
-Because their is no apparent score, and any given player either wins, loses, or draws
-to/with the other player, Connect Four is a fully-competitive game,
-specifically it is a zero-sum game because any one players "score" is the opposite of their
-opponents \cite{IEEEhowto:gametheory}.
+Because their is no apparent score, and any given player either wins, loses, or draws Connect Four 
+is a fully-competitive game \cite{IEEEhowto:gametheory}. 
+As the decisions of both players are visible to each other
+it is also said that Connect Four is a game of perfect information \cite{IEEEhowto:gametheory}.
+With both of these qualities in mind, Connect Four is a zero-sum game because any one players 
+"score" is the opposite of their opponent's \cite{IEEEhowto:gametheory}.
 For example, if the "score" was how many turns it would take you to achieve four
 consecutive disks given the other player played a perfect game, then their score would be the
 negative of your score.
@@ -426,7 +430,8 @@ notion of what this "score" actually is, we have not yet decided a way to measur
 but the value itself is certainly related to how many turns it would take the AI to force a win
 (if the other player plays perfectly) and the total number of turns that have already passed.
 If the AI finds that its maximum "score" for all possible moves is zero then it has found that if the other player also plays perfectly then it is guaranteed to fill the board and draw.
-If any given move could not possibly lead to a win if the other player plays perfectly, the "score" is then negative and the AI is likely to lose. Choosing to maximize a negative score will 
+If any given move could not possibly lead to a win if the other player plays perfectly, the 
+"score" is then negative and the AI is likely to lose. Choosing to maximize a negative score will 
 ensure that the AI loses in as many turns as possible.
 
 
@@ -461,13 +466,14 @@ and move has yet been made then it should be able to ignore permutations where v
 There are also
 other important pieces of information such as the fact that a perfect game (a game where both
 players make all of the most ideal decisions when it is their turn) can only be played if the 
-first player makes their first move in the middle column of the board [reference numberphile]. 
+first player makes their first move in the middle column of the board \cite{IEEEhowto:youtube}. 
 This fact alone trims the number of possible permutations roughly by a factor of seven. Our
 overall goal for this Connect Four AI will be that if we pit two versions of it against each
 other, it should play a perfect game that ends with the first player winning on the second to
 last turn on as many instances as possible. In our case, we may have to trade precision for
 computation time by either reducing the lookahead depth of our minimax tree structure or
 developing some other optimization or set of optimizations to the minimax algorithm.
+
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
@@ -562,27 +568,25 @@ developing some other optimization or set of optimizations to the minimax algori
 % footnotes above bottom floats. This can be corrected via the
 % \fnbelowfloat command of the stfloats package.
 
-
-
-
 \section{Proposed Implementation and Preliminary Results}
 
-\subsection{Structure of a Connect Four Game Permutation}
 
-Explain the overall structure of any given Connect Four game, discuss how minimax can traverse
-these permutations. Perhaps including an image of a theoretical game.
+\subsection{Structure of a Connect Four Game Permutation}
 
 As per the rules of Connect Four, at any given point in time a player has the choice of placing
 a disk in one of up to seven valid columns. At the beginning of the game, all seven columns are
 available, and the total number of possible game permutations is at its maximum of 4.5 trillion.
 Upon deciding one of the seven columns, the game has advanced to the depth below, cutting the
-number of permutations by a factor of roughly seven. Although columns can eventually be filled,
+number of permutations by a factor of roughly seven. As columns can eventually be filled,
 and not all placements of disks are valid as the game ends when four disks are lined up
 consecutively in a winning configuration, the game of Connect Four can be thought of as a
-seven-ary tree of height 42, with all of the leaves (the bottom nodes of the tree) representing
-either a victory, loss, or draw in the case of the very bottom leaves at depth 42.
+multiway tree \cite{IEEEhowto:multiwaytree}
+of height 42, with all of the leaves (the bottom nodes of the tree) representing
+either a victory, loss, or draw in the case of the very bottom leaves at depth 42. Although
+the game of Connect Four is a multiway tree, the number of leaves at a particular child node
+is between zero and seven.
 
-(maybe include an image of seven-ary tree here)
+\textit{maybe include an image of multiway tree here}
 
 Minimax must traverse this structure of Connect Four in such a way that it would return to the
 AI either the certainty of a perfect move, or at the least it's best approximation up to a certain
@@ -590,30 +594,59 @@ depth. Although we know that the true number of permutations is just over 4.5 tr
 possible to think of Connect Four as being bounded by $ 7^n $ where $ n \leq 42 $ is the
 number of turns that have passed.
 For example, up to the sixth turn of play no columns may be full and no wins are
-possible, so the true number of permutations is $ 7 x 7 ... x 7 = 7^7 = 823,543 $. This is because
-at every turn up to seven columns can possibly be chosen, and the next turn up to seven more can
-be chosen, and so on. An implementation of minimax with an exponential upperbound of
+possible, so the number of permutations is bounded by $ 7 x 7 ... x 7 = 7^6 = 117,649 $
+where the true number of permutations is 22100 according to Numberphile \cite{IEEEhowto:youtube}. 
+This is calculated assuming that at every turn up to seven columns can possibly be chosen, and the 
+next turn up to  seven more can be chosen, and so on. 
+An implementation of minimax with an exponential upperbound of
 $ O(n) = 7^n $ is not ideal or even computationally possible at a depth of 42, nor is it practical
 when examining the true upperbound of 4.5 trillion computed permutations.
 
+
 \subsection{More on Minimax and Alpha-Beta}
 
-Explain the history of minimax and alpha-beta, perhaps discuss the nature of zero-sum games
-and mention a formal definition of minimax according to a formal source. Possibly the same for
-Alpha-Beta.
+\textit{Explain the history of minimax and alpha-beta, perhaps discuss the nature of zero-sum games and mention a formal definition of minimax according to a formal source. Possibly the same 
+for Alpha-Beta.}
+
+The minimax algorithm is designed to find the optimal strategy for the first player, and to decide 
+the best (first) move. According to the authors of \emph{Artificial Intelligence: a Modern 
+Approach} a formal five step application of minimax does the following 
+\cite{IEEEhowto:modernapproach}:
+
+\begin{itemize}
+
+\item Generate the whole game tree all the way down to the terminal states
+
+\item Apply the utility function to all of the terminal states to get its value
+
+\item Use the utlity of all of the terminal states to determine the utility of the nodes one
+level higher. The utility of nodes not belonging to the first player is generated assuming that
+the second player will make the right move.
+
+\item Continue backing up utility values for the leaf nodes towards the root one layer at a time.
+
+\item Eventually the valeus have reached the root, and player one will choose the value that has
+the greatest utility.
+
+\end{itemize}
+
+Our implementation of this may include the use of the multiway tree discussed in the last section,
+and a recursive traversal of the leaf nodes. Where computation limits the effectiveness of our
+algorithm, the depth of the traversal may be altered to decrease the amount of computations
+required while still giving an approximation of the next best move \cite{IEEEhowto:minimax}.
 
 \subsection{Progress Thus Far}
 
-Mention the UI, mention the tree structure maybe include a picture, maybe include forward
+\textit{Mention the UI, mention the tree structure maybe include a picture, maybe include forward
 declarations of what our functions will be (without code so just inputs, outputs, and what they
-do).
+do).}
 
 % conference papers do not normally have an appendix
 
 % use section* for acknowledgment
 \section{Conclusion}
 
-The conclusion goes here.
+\textit{Sum up all of the sections, restate the goal of the Connect Four solver}
 
 % trigger a \newpage just before the given reference
 % number - used to balance the columns on the last page
@@ -639,13 +672,32 @@ The conclusion goes here.
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
 
-% need actual citations, for now I just have the link(s)
+% not a correct MLA citation
 
 \bibitem{IEEEhowto:youtube}
 https://www.youtube.com/watch?v=yDWPi1pZ0Po
 
+% correct MLA citation
+
 \bibitem{IEEEhowto:gametheory}
 Resnik, Michael D. “GAME THEORY.” \emph{Choices: An Introduction to Decision Theory}, NED - New edition ed., University of Minnesota Press, 1987, pp. 121–176. \emph{JSTOR}, www.jstor.org/stable/10.5749/j.ctttshgd.9.
+
+% correct MLA citation
+
+\bibitem{IEEEhowto:multiwaytree}
+Black, Paul E. "multiway tree", \emph{Dictionary of Algorithms and Data Structures}, Vreda Pieterse and Paul E. Black, eds. 27 October 2005, xlinux.nist.gov/dads/HTML/multiwaytree.html.
+
+% correct MLA citation
+
+\bibitem{IEEEhowto:minimax}
+Rajiv Bakulesh Shah, "minimax", \emph{Dictionary of Algorithms and Data Structures}, Vreda Pieterse and Paul E. Black, eds. 10 January 2007, xlinux.nist.gov/dads/HTML/minimax.html.
+
+% correct MLA citation, link: https://www.cin.ufpe.br/~tfl2/artificial-intelligence-modern-approach.9780131038059.25368.pdfa
+
+\bibitem{IEEEhowto:modernapproach}
+Russell, Stuart J., and Peter Norvig. \emph{Artificial intelligence : a modern approach}. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
+
+% example of the format of a citation, I kept it for now as a reference
 
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
@@ -653,20 +705,62 @@ H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
 
 \end{thebibliography}
 
-\section*{Justification of Sources}
 
-\subsection{Numberphile}
+\section*{Reference Reviews}
+
+
+\subsection*{Numberphile}
 
 Although an informal source, the calculations provided by the youtube video posted under the
 name "Connect Four - Numberphile" are instrumental in providing insight into the number of 
 possible permutations that would be explored by minimax at the beginning of any given game. 
 As the total number of valid permutations is computed by making every possible move at every
 possible turn, it is essentially an application of minimax on the first turn of play and
-represents the total number of iterations of the depth tree.
-The concept
+represents the total number of iterations of the depth tree. The concept
 of a perfect game in which both players make ideal moves and end with the first player's victory
 on the 41st turn of play also provides some optimum goal for our AI to achieve (whether or not
 we are able to do so).
+
+
+\subsection*{Choices: An Introduction to Decision Theory}
+
+A more formal source that explores all manner of two-person competitive and non-competetive games
+and provides proofs for the completeness of a (mixed strategy) solution for a two-person competitive zero-sum game such as tic-tac-toe. 
+Used to provide a formal definition of Connect Four as a fully-competitive
+zero-sum game in which the ideal utility function of the first player on their turn results in
+the negative ideal of the same utility function of the second player on their turn. The author
+also provides a formal definition of the minimax theorem with respect to the utility matrix of
+a given game.
+
+
+\subsection*{Multiway Tree}
+
+A standard definition of a multiway tree structure that may be followed by our minimax algorithm,
+the tree would be traversed with a depth-first recursive search. The root of the tree represents
+the maximum score for a given player, the children of this node (bounded by 0-7) represent the
+possible moves for the given player on the next turn, the children of these nodes (bounded by 0-49 
+total children for all previous nodes) represent the moves of the opposite player.
+
+
+\subsection*{Minimax}
+
+A standard definition of a minimax algorithm that may be used by our Connect Four solver, the
+minimax algorithm would perform a recursive traversal of our multiway tree that stores the game
+state of all possible upcoming moves. The minimax implementation will assume all moves made are
+perfect, and calculate its maximum score for the given player at the given depth based on this
+fact.
+
+
+\subsection*{Artificial Intelligence: A Modern Approach}
+
+Although somewhat dated in its calculation of the amount of time it would take for algorithms such 
+as minimax and alpha-beta to complete down to their terminal states, the authors still provide 
+relevant definitions and examples of the algorithms in action. 
+A figure very similar to our application of minimax to the problem of Connect Four is
+presented for the similar game, Tic-Tac-Toe. This figure demonstrates the terminal states with
+utility values, and also the backwards recursion to the root node ultimately deciding MAX's
+game decision.
+
 
 % that's all folks
 \end{document}
