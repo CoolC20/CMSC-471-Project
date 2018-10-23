@@ -405,13 +405,23 @@ to line up four consecutive disks either horizontally, vertically, or diagonally
 six disks inside of it is a full column, and players cannot place their disks in such a column.
 Players must place a disk when it is their turn unless the game board is full. If the game board
 is full and no player has lined up four disks consecutively in any winning configuration, the game
-is a draw. Because their is no apparent score, and any given player either wins, loses, or draws
-to/with the other player, Connect Four is a non-cooperative game, specifically it is a zero-sum
-game. Because it is a zero-sum game with many possible permutations of play, we have chosen to
+is a draw. 
+
+Because their is no apparent score, and any given player either wins, loses, or draws
+to/with the other player, Connect Four is a fully-competitive game,
+specifically it is a zero-sum game because any one players "score" is the opposite of their
+opponents \cite{IEEEhowto:gametheory}.
+For example, if the "score" was how many turns it would take you to achieve four
+consecutive disks given the other player played a perfect game, then their score would be the
+negative of your score.
+
+Because it is a zero-sum game with many possible permutations of game states, we have chosen to
 apply a, more or less, brute force minimax algorithm to solving Connect Four from a given game
 state onwards. This algorithm would look ahead as far as possible into the moves that could be
 made by both players, and choose the one that maximizes the "score" of the AI player, thus
-minimizing the "score" of the other player. In order to maximize a "score", there must be some
+minimizing the "score" of the other player. 
+
+In order to maximize a "score", there must be some
 notion of what this "score" actually is, we have not yet decided a way to measure this score
 but the value itself is certainly related to how many turns it would take the AI to force a win
 (if the other player plays perfectly) and the total number of turns that have already passed.
@@ -427,8 +437,8 @@ beginning to end, they are capable of winning the game every single time regardl
 of the decisions of the second player. The most interesting subset of these winning
 games is that in which the second player also plays a perfect game (which is to say 
 again, that they make all the right decisions on every turn), and loses on the 
-second to last (41st) turn of play [numberphile]. These perfect games end in such a way that there is only one column left for both players to play their disks inside of, and every instance
-includes a forced loss by player two as they must give player one the win.
+second to last (41st) turn of play \cite{IEEEhowto:youtube}. These perfect games end in such a way 
+that there is only one column left for both players to play their disks inside of, and every instance includes a forced loss by player two as they must give player one the win.
 
 
 \subsection{Computing the Perfect Solution}
@@ -436,17 +446,19 @@ Our chosen algorithm, minimax, is entirely capable of producing a perfect soluti
 first player at every turn of play given we allow it to run for as long as it requires. The
 problem with this is that it will require a length of time that is unreasonable for our
 purposes. The total number of valid Connect Four game permutations is over 4.5 trillion
-[numberphile youtube video] for a game where the first player has yet to make their first
+\cite{IEEEhowto:youtube} for a game where the first player has yet to make their first
 move. Our minimax algorithm would have to sift through all possible permutations
 in order to come to the conclusion that it can win a perfect game on the second to last turn
-assuming that the second player will also play a perfect game, as our minimax will. This
-implementation of a brute force minimax is not ideal and we have decided to optimize it in
+assuming that the second player will also play a perfect game, as our minimax will. 
+
+This implementation of a brute force minimax is not ideal and we have decided to optimize it in
 any way that we can. Although we have yet to implement minimax in our vision, the most obvious
 way to optimize the traversal of all of the possible permutations is to use an Alpha-beta method
 of trimming off depth iterations that are either unrealistic or inherently flawed. If the AI is
 aware, as it should be, that it will be guaranteed to be able to win if it is the first player
-and move has yet been made then it should be able to ignore permutations where victory is impossible or defeat is certain
-unless it finds that victory is in fact impossible or defeat is in fact certain. There are also
+and move has yet been made then it should be able to ignore permutations where victory is impossible or defeat is certain unless it finds that victory is in fact impossible or defeat is in fact certain. 
+
+There are also
 other important pieces of information such as the fact that a perfect game (a game where both
 players make all of the most ideal decisions when it is their turn) can only be played if the 
 first player makes their first move in the middle column of the board [reference numberphile]. 
@@ -560,6 +572,30 @@ developing some other optimization or set of optimizations to the minimax algori
 Explain the overall structure of any given Connect Four game, discuss how minimax can traverse
 these permutations. Perhaps including an image of a theoretical game.
 
+As per the rules of Connect Four, at any given point in time a player has the choice of placing
+a disk in one of up to seven valid columns. At the beginning of the game, all seven columns are
+available, and the total number of possible game permutations is at its maximum of 4.5 trillion.
+Upon deciding one of the seven columns, the game has advanced to the depth below, cutting the
+number of permutations by a factor of roughly seven. Although columns can eventually be filled,
+and not all placements of disks are valid as the game ends when four disks are lined up
+consecutively in a winning configuration, the game of Connect Four can be thought of as a
+seven-ary tree of height 42, with all of the leaves (the bottom nodes of the tree) representing
+either a victory, loss, or draw in the case of the very bottom leaves at depth 42.
+
+(maybe include an image of seven-ary tree here)
+
+Minimax must traverse this structure of Connect Four in such a way that it would return to the
+AI either the certainty of a perfect move, or at the least it's best approximation up to a certain
+depth. Although we know that the true number of permutations is just over 4.5 trillion, it is
+possible to think of Connect Four as being bounded by $ 7^n $ where $ n \leq 42 $ is the
+number of turns that have passed.
+For example, up to the sixth turn of play no columns may be full and no wins are
+possible, so the true number of permutations is $ 7 x 7 ... x 7 = 7^7 = 823,543 $. This is because
+at every turn up to seven columns can possibly be chosen, and the next turn up to seven more can
+be chosen, and so on. An implementation of minimax with an exponential upperbound of
+$ O(n) = 7^n $ is not ideal or even computationally possible at a depth of 42, nor is it practical
+when examining the true upperbound of 4.5 trillion computed permutations.
+
 \subsection{More on Minimax and Alpha-Beta}
 
 Explain the history of minimax and alpha-beta, perhaps discuss the nature of zero-sum games
@@ -568,7 +604,9 @@ Alpha-Beta.
 
 \subsection{Progress Thus Far}
 
-Mention the UI, maybe include a picture.
+Mention the UI, mention the tree structure maybe include a picture, maybe include forward
+declarations of what our functions will be (without code so just inputs, outputs, and what they
+do).
 
 % conference papers do not normally have an appendix
 
@@ -606,6 +644,9 @@ The conclusion goes here.
 \bibitem{IEEEhowto:youtube}
 https://www.youtube.com/watch?v=yDWPi1pZ0Po
 
+\bibitem{IEEEhowto:gametheory}
+Resnik, Michael D. “GAME THEORY.” \emph{Choices: An Introduction to Decision Theory}, NED - New edition ed., University of Minnesota Press, 1987, pp. 121–176. \emph{JSTOR}, www.jstor.org/stable/10.5749/j.ctttshgd.9.
+
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
@@ -617,11 +658,15 @@ H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
 \subsection{Numberphile}
 
 Although an informal source, the calculations provided by the youtube video posted under the
-channel "Numberphile" are instrumental in providing insight into the number of possible
-permutations that would be explored by minimax at the beginning of any given game. The concept
+name "Connect Four - Numberphile" are instrumental in providing insight into the number of 
+possible permutations that would be explored by minimax at the beginning of any given game. 
+As the total number of valid permutations is computed by making every possible move at every
+possible turn, it is essentially an application of minimax on the first turn of play and
+represents the total number of iterations of the depth tree.
+The concept
 of a perfect game in which both players make ideal moves and end with the first player's victory
 on the 41st turn of play also provides some optimum goal for our AI to achieve (whether or not
-we are able to do this).
+we are able to do so).
 
 % that's all folks
 \end{document}
