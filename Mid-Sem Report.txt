@@ -399,22 +399,63 @@ explored as well as approximations into the number of possible game states
 and other interesting statistics.
 
 \subsection{Connect Four and Game Theory}
-
+Connect Four is a game in which two players alternate in placing disks in one of seven columns
+of a game board that is seven columns wide by six rows high in such a way that they are able
+to line up four consecutive disks either horizontally, vertically, or diagonally. A column with
+six disks inside of it is a full column, and players cannot place their disks in such a column.
+Players must place a disk when it is their turn unless the game board is full. If the game board
+is full and no player has lined up four disks consecutively in any winning configuration, the game
+is a draw. Because their is no apparent score, and any given player either wins, loses, or draws
+to/with the other player, Connect Four is a non-cooperative game, specifically it is a zero-sum
+game. Because it is a zero-sum game with many possible permutations of play, we have chosen to
+apply a, more or less, brute force minimax algorithm to solving Connect Four from a given game
+state onwards. This algorithm would look ahead as far as possible into the moves that could be
+made by both players, and choose the one that maximizes the "score" of the AI player, thus
+minimizing the "score" of the other player. In order to maximize a "score", there must be some
+notion of what this "score" actually is, we have not yet decided a way to measure this score
+but the value itself is certainly related to how many turns it would take the AI to force a win
+(if the other player plays perfectly) and the total number of turns that have already passed.
+If the AI finds that its maximum "score" for all possible moves is zero then it has found that if the other player also plays perfectly then it is guaranteed to fill the board and draw.
+If any given move could not possibly lead to a win if the other player plays perfectly, the "score" is then negative and the AI is likely to lose. Choosing to maximize a negative score will 
+ensure that the AI loses in as many turns as possible.
 
 
 \subsection{A Perfect Solution}
-
 If the Connect Four game board is empty and you are the first player, victory is always possible. 
 In other words, if the first player makes the right decision on every turn of play from
 beginning to end, they are capable of winning the game every single time regardless
 of the decisions of the second player. The most interesting subset of these winning
 games is that in which the second player also plays a perfect game (which is to say 
 again, that they make all the right decisions on every turn), and loses on the 
-second to last (41st) turn of play. These perfect games end in such a way that there is
-only one column left for both players to play their disks inside of, and every instance
-includes a forced loss by player two as they must give player one the win. (references
-a youtube video by numberphile).
+second to last (41st) turn of play [numberphile]. These perfect games end in such a way that there is only one column left for both players to play their disks inside of, and every instance
+includes a forced loss by player two as they must give player one the win.
 
+
+\subsection{Computing the Perfect Solution}
+Our chosen algorithm, minimax, is entirely capable of producing a perfect solution for the
+first player at every turn of play given we allow it to run for as long as it requires. The
+problem with this is that it will require a length of time that is unreasonable for our
+purposes. The total number of valid Connect Four game permutations is over 4.5 trillion
+[numberphile youtube video] for a game where the first player has yet to make their first
+move. Our minimax algorithm would have to sift through all possible permutations
+in order to come to the conclusion that it can win a perfect game on the second to last turn
+assuming that the second player will also play a perfect game, as our minimax will. This
+implementation of a brute force minimax is not ideal and we have decided to optimize it in
+any way that we can. Although we have yet to implement minimax in our vision, the most obvious
+way to optimize the traversal of all of the possible permutations is to use an Alpha-beta method
+of trimming off depth iterations that are either unrealistic or inherently flawed. If the AI is
+aware, as it should be, that it will be guaranteed to be able to win if it is the first player
+and move has yet been made then it should be able to ignore permutations where victory is impossible or defeat is certain
+unless it finds that victory is in fact impossible or defeat is in fact certain. There are also
+other important pieces of information such as the fact that a perfect game (a game where both
+players make all of the most ideal decisions when it is their turn) can only be played if the 
+first player makes their first move in the middle column of the board [reference numberphile]. 
+This fact alone trims the number of possible permutations roughly by a factor of seven. Our
+overall goal for this Connect Four AI will be that if we pit two versions of it against each
+other, it should play a perfect game that ends with the first player winning on the second to
+last turn on as many instances as possible. In our case, we may have to trade precision for
+computation time by either reducing the lookahead depth of our minimax tree structure or
+developing some other optimization or set of optimizations to the minimax algorithm.
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
@@ -512,24 +553,29 @@ a youtube video by numberphile).
 
 
 
-\section{Conclusion}
-The conclusion goes here.
+\section{Proposed Implementation and Preliminary Results}
 
+\subsection{Structure of a Connect Four Game Permutation}
 
+Explain the overall structure of any given Connect Four game, discuss how minimax can traverse
+these permutations. Perhaps including an image of a theoretical game.
 
+\subsection{More on Minimax and Alpha-Beta}
+
+Explain the history of minimax and alpha-beta, perhaps discuss the nature of zero-sum games
+and mention a formal definition of minimax according to a formal source. Possibly the same for
+Alpha-Beta.
+
+\subsection{Progress Thus Far}
+
+Mention the UI, maybe include a picture.
 
 % conference papers do not normally have an appendix
 
-
 % use section* for acknowledgment
-\section*{Acknowledgment}
+\section{Conclusion}
 
-
-The authors would like to thank...
-
-
-
-
+The conclusion goes here.
 
 % trigger a \newpage just before the given reference
 % number - used to balance the columns on the last page
@@ -555,16 +601,27 @@ The authors would like to thank...
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
 
+% need actual citations, for now I just have the link(s)
+
+\bibitem{IEEEhowto:youtube}
+https://www.youtube.com/watch?v=yDWPi1pZ0Po
+
 \bibitem{IEEEhowto:kopka}
 H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 
 \end{thebibliography}
 
+\section*{Justification of Sources}
 
+\subsection{Numberphile}
 
+Although an informal source, the calculations provided by the youtube video posted under the
+channel "Numberphile" are instrumental in providing insight into the number of possible
+permutations that would be explored by minimax at the beginning of any given game. The concept
+of a perfect game in which both players make ideal moves and end with the first player's victory
+on the 41st turn of play also provides some optimum goal for our AI to achieve (whether or not
+we are able to do this).
 
 % that's all folks
 \end{document}
-
-
