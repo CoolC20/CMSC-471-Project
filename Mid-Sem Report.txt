@@ -144,11 +144,11 @@ when examining the true upperbound of 4.5 trillion computed permutations.
 
 \subsection{More on Minimax}
 
-The Mini-Max Algorithm was first created in 1958 for use in computer chess games as part of a larger research interest in Artificial Intelligence. This AI created a tree detailing all possible moves by using heuristics to determine what moves were legal. The tree was pruned using an Alpha-Beta algorithm to keep complexity down and reduce the number of moves needed to explore.\cite{IEEEhowto:Min-MaxHistory}:
+The Mini-Max Algorithm was first created in 1958 for use in computer chess games as part of a larger research interest in Artificial Intelligence. This AI created a tree detailing all possible moves by using heuristics to determine what moves were legal. The tree was pruned using an Alpha-Beta algorithm to keep complexity down and reduce the number of moves needed to explore.\cite{IEEEhowto:Min-MaxHistory}
 
 In order to properly define a the mini-max algorithm, we must define two other terms first. 
 A \textit{Finite Game} is a game which is guaranteed to finish. There can be no potential endless games. Every move makes the game move one step closer to completion.
-A \textit{Zero-Sum Game} is a game in which the payoffs for all players (determined by the result of the game) sum up to zero. This means that after adding up every potential outcome of the game, where every outcome is assigned a value based on its' utility, the end result is zero.\cite{IEEEhowto:Min-MaxAlgo}:
+A \textit{Zero-Sum Game} is a game in which the payoffs for all players (determined by the result of the game) sum up to zero. This means that after adding up every potential outcome of the game, where every outcome is assigned a value based on its' utility, the end result is zero.\cite{IEEEhowto:Min-MaxAlgo}
 
 The Min-Max Theorem is derived from these concepts. For every finite two-person zero-sum game there exists at least one optimal mixed strategy. Therefore, there exists a game value $v$, such that by applying the optimal strategy the first player guarantees for himself a payoff not worse than v, while the second player guarantees for himself a payoff not worse
 than $−-v$.
@@ -178,7 +178,7 @@ the greatest utility.
 Our implementation of this may include the use of the multi-way tree discussed in the last section,
 and a recursive traversal of the leaf nodes. Where computation limits the effectiveness of our
 algorithm, the depth of the traversal may be altered to decrease the amount of computations
-required while still giving an approximation of the next best move. \cite{IEEEhowto:minimax}:
+required while still giving an approximation of the next best move. \cite{IEEEhowto:minimax}
 
 \subsection{More on Alpha-Beta Algorithm}
 Many different programmers independently discovered the Alpha-Beta algorithm. This algorithm aims to reduce the number of comparisons needed when computing the optimal move for a player.
@@ -186,7 +186,7 @@ Many different programmers independently discovered the Alpha-Beta algorithm. Th
 The alpha $a$ represents the guaranteed payoff for the maximizing player, as the computer has determined so far. The computer will continue to update this value as it traverses the tree.
 The beta $b$ represents the guaranteed payoff for the minimizing player, as the computer has determined so far.
 
-The algorithm starts the tree traversal with the $a = -infinity$ and $b = infinity$. As the algorithm descends the tree, the program updates the values of both for each node. The program then checks that $a > b$. If this is the case, the program will ignore descending down that subtree, as it will never need to be computed since the computer has already discovered a more optimal move than anything that that particular subtree could provide. As a result, the program can bypass many subtrees and save computational time.\cite{IEEEhowto:Min-MaxAlgo}:
+The algorithm starts the tree traversal with the $a = -infinity$ and $b = infinity$. As the algorithm descends the tree, the program updates the values of both for each node. The program then checks that $a > b$. If this is the case, the program will ignore descending down that subtree, as it will never need to be computed since the computer has already discovered a more optimal move than anything that that particular subtree could provide. As a result, the program can bypass many subtrees and save computational time.\cite{IEEEhowto:Min-MaxAlgo}
 
 \subsection{Progress Thus Far}
 
@@ -300,4 +300,3 @@ A simple web page detailing a brief history of the Mini-Max formula and its firs
 
 % that's all folks
 \end{document}
-
