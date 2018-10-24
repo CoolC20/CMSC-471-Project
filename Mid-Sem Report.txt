@@ -127,8 +127,6 @@ either a victory, loss, or draw in the case of the very bottom leaves at depth 4
 the game of Connect Four is a multiway tree, the number of leaves at a particular child node
 is between zero and seven.
 
-\textit{maybe include an image of multiway tree here}
-
 Minimax must traverse this structure of Connect Four in such a way that it would return to the
 AI either the certainty of a perfect move, or at the least it's best approximation up to a certain
 depth. Although we know that the true number of permutations is just over 4.5 trillion, it is
@@ -202,12 +200,18 @@ Once the player makes their move, control of the board will be passed to the AI,
 % use section* for acknowledgment
 \section{Conclusion}
 
-\textit{Sum up all of the sections, restate the goal of the Connect Four solver}
+As previously stated the overall goal of the Connect Four solver is to first implement a minimax
+solution up to a certain depth, and then incrementally optimize our algorithm with alpha-beta
+trimming and whatever other set of optimizations we deem fit. The ideal Connect Four solver
+is able to generate the dominant nash equilibrium for the first player that leads to a game
+that lasts 41 turns, and ends with the second players forced defeat on their last turn of play.
+Our implementation should approach as close to this ideal as possible in such a way that does
+not sacrifice our understanding of the process by which we are generating our results.
 
 \begin{thebibliography}{1}
 
 \bibitem{IEEEhowto:youtube}
-https://www.youtube.com/watch?v=yDWPi1pZ0Po
+Haran, Brady. “Connect Four - Numberphile.” \emph{YouTube}, Numberphile, 1 Dec. 2013, www.youtube.com/watch?v=yDWPi1pZ0Po.
 
 \bibitem{IEEEhowto:gametheory}
 Resnik, Michael D. “GAME THEORY.” \emph{Choices: An Introduction to Decision Theory}, NED - New edition ed., University of Minnesota Press, 1987, pp. 121–176. \emph{JSTOR}, www.jstor.org/stable/10.5749/j.ctttshgd.9.
@@ -222,10 +226,6 @@ Rajiv Bakulesh Shah, "minimax", \emph{Dictionary of Algorithms and Data Structur
 
 \bibitem{IEEEhowto:modernapproach}
 Russell, Stuart J., and Peter Norvig. \emph{Artificial intelligence : a modern approach}. Englewood Cliffs, N.J: Prentice Hall, 1995. Print.
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 
 \bibitem{IEEEhowto:Min-MaxAlgo}
 Klesk, Przemyslaw, \emph{MIN-MAX algorithm — history, variants, refinements \LaTeX}, Department of Methods of Artificial Intelligence and Applied Mathematics
@@ -300,3 +300,4 @@ A simple web page detailing a brief history of the Mini-Max formula and its firs
 
 % that's all folks
 \end{document}
+
