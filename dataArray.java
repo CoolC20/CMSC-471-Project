@@ -1,4 +1,5 @@
 //A class to hold the data from the data set
+//Uses the gameState class
 class dataArray{
 
     final int numElements = 67557;
