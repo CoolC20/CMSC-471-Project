@@ -1,4 +1,4 @@
-public class Piece{
+public class Piece implements Thing{
     private int alpha;
 	private int beta;
 	private String color1;
@@ -38,5 +38,8 @@ public class Piece{
 	}
 	public void setSecondColor(String col){
 		 color2 = col;
+	}
+	public void printPiece(){
+		System.out.format("%d is alpha, %d is beta, %s is color1, %s is color2\n", alpha, beta, color1, color2); 
 	}
 }
