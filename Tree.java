@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class Tree implements Thing{
     private Node head;
 
@@ -55,29 +57,18 @@ public class Tree implements Thing{
     }
 
 
-    //technically doesn't remove node, but replaces the values within the node with empty ones.
-    public void removeChild(Node parent, Node leaf){
-        Node current = parent;
-        boolean in = false;
-        while(!in){
-            in = current.removeChild(leaf);
-            if(in == false){
-                int start = 0;
-                current = current.indexAt(start);
-                while(current.isFull() == true){
-                    start++;
-                    if(start == 8){
-                        removeChild(current.indexAt(0), leaf);
-                        return;
-                    }
-                    current = current.indexAt(start);
-                }
-                if(current.isFull() == false){
-                    System.out.println("This leaf is not in the tree.");
-                    return;
-                }
+    //deconstructs the tree from the passed node
+    private void deconstructLeaf(Node toDelete){
+        for(int i = 0; i<7; i++){
+            if(toDelete.getChildAt(i) != null){
+                deconstructLeaf(toDelete.getChildAt(i));//recursive call to delete children
+                toDelete.removeChildAt(i); //delete the node
             }
         }
+    }
+    private void deleteTree(){
+        deconstructLeaf(head);
+        head = null;
     }
 
     //only able to print out head and 7 immediate children(no recursion/subtrees)
@@ -105,7 +96,7 @@ public class Tree implements Thing{
     }
 
     //fills the tree with every possible game state for a depth of 5
-    public void fillTree(Node passed) {
+    private void fillTree(Node passed) {
         //check for tree depth of 5, we dont want to go further than 5 deep
         if (passed.getHeight() < 5) {
 
@@ -147,7 +138,7 @@ public class Tree implements Thing{
     }
 
     //puts weights in the tree depending on the desireability of each node
-    public void assignEndingsOfTree(Node passed, dataArray array){
+    private void assignEndingsOfTree(Node passed, dataArray array){
         //check if passed's game board is an ending state
         int atSpot = array.isInArray(passed.getData().getBoard());
 
@@ -169,7 +160,8 @@ public class Tree implements Thing{
 
     }
 
-    public void weighTree(Node passed){
+    //computes the weights of the tree
+    private void weighTree(Node passed){
         int nextMove = -1; //maintains which move the entity will make based off the computed weights
 
         //check if this game board leads to an end by itself
@@ -229,5 +221,51 @@ public class Tree implements Thing{
         if(passed.getData().getNextMove() != -1){
             printOptimalGamePath(passed.getChildAt(passed.getData().getNextMove()));
         }
+    }
+
+    //returns the next optimal move, or a random move if there is no optimal move
+    private int getNextMove(gameState currentGame){
+        //check if there is an optimal move
+        if(head.getData().getNextMove() != -1)
+            return head.getData().getNextMove();
+        //there is no optimal move, generate a random one
+        else{
+            Random rand = new Random();
+
+            int n = rand.nextInt(7);
+            while(!currentGame.hasRoomOnColumn(n)) {//find a random one to fill the spot
+                n = rand.nextInt(7);
+            }
+            return n;
+        }
+    }
+
+    public static int AILoop(gameState currentGame, dataArray gameStateArray){
+        int toReturn = -1;
+
+        //This portion leads up to the end game state if we aren't already there
+        if(gameStateArray.isInArray(currentGame) != -1) { //if the current game isn't in an end game state
+            System.out.println("Creating Tree...");
+            Tree decisionTree = new Tree(currentGame);
+
+            System.out.println("Filling Tree...");
+            decisionTree.fillTree(decisionTree.getHead());
+
+            System.out.println("Computing Game Endings of Tree...");
+            decisionTree.assignEndingsOfTree(decisionTree.getHead(), gameStateArray);
+
+            System.out.println("Calculating Weights of Tree...");
+            decisionTree.weighTree(decisionTree.getHead());
+
+            System.out.println("Getting Next Optimal Move");
+            toReturn = decisionTree.getNextMove(currentGame);
+
+            System.out.println("Deleting Tree...");
+            decisionTree.deleteTree();
+        }
+        else{ //The current game is in an end game state
+
+        }
+        return toReturn;
     }
 }
