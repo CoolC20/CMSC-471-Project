@@ -2,7 +2,7 @@ import java.util.Random;
 
 public class Tree implements Thing{
     private Node head;
-
+    final int treeDepth = 5; //NOTE:: CHANGE THIS TO ALTER HOW DEEP THE TREE IS
 
     //default constructor and non-default constructor
     public Tree(){
@@ -74,7 +74,7 @@ public class Tree implements Thing{
     //fills the tree with every possible game state for a depth of 5
     private void fillTree(Node passed) {
         //check for tree depth of 5, we dont want to go further than 5 deep
-        if (passed.getHeight() < 4) {
+        if (passed.getHeight() < treeDepth) {
 
             //loop through every column
             for (int i = 0; i < 7; i++) {
