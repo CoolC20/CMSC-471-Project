@@ -27,33 +27,9 @@ public class Tree implements Thing{
 
 
     //adds child to tree
-    public void addChild(Node parent,Node leaf){
-        Node current = parent;
-        boolean in = false;
-        while(!in){
-            //if tree has an empty child, the leaf inserted into that place
-            in = current.addChild(leaf);
-            if(in == false){
-                //if not, searches for subtree that does
-                int start = 0;
-                current = current.indexAt(start);
-                //if current subtree is full, moves to next one on same level
-                while(current.isFull() == true){
-                    start++;
-                    //if all 7 children of the current tree have full subtrees, moves down one level
-                    if(start == 8){
-                        start = 0;
-                        current = current.indexAt(start);
-                        addChild(current, leaf);
-                        return;
-                    }
-                    current = current.indexAt(start);
-                }
-                //adds child to subtree
-                addChild(current,leaf);
-                break;
-            }
-        }
+    public void addChild(Node parent,Node leaf, int spot){
+        //leaf.piece.printPiece();
+        parent.addChild(leaf, spot);
     }
 
 
@@ -98,21 +74,22 @@ public class Tree implements Thing{
     //fills the tree with every possible game state for a depth of 5
     private void fillTree(Node passed) {
         //check for tree depth of 5, we dont want to go further than 5 deep
-        if (passed.getHeight() < 5) {
+        if (passed.getHeight() < 4) {
 
             //loop through every column
             for (int i = 0; i < 7; i++) {
 
                 //check if there is room on that column
                 if (passed.hasRoomOnColumn(i)) {
+                    //System.out.println("Creating child at sopt " + i);
 
                     //create a new game board to represent that move
                     gameState tempBoard = new gameState(passed.getData().board);
                     char x;
-                    if(passed.getHeight()%2 == 0)
-                        x = 'x';
+                    if(passed.getTurn() == "AI")
+                        x = 'x'; //parent was AI, child should be Player token
                     else
-                        x = 'o';
+                        x = 'o';    //parent was Player, child should be AI token
                     tempBoard.insertIntoColumn(i, x);
 
                     //make a new temp Piece to to assign to the leaf
@@ -125,7 +102,7 @@ public class Tree implements Thing{
                     passed.initializeLeaf(i);
 
                     //update the tree with the new node
-                    this.addChild(passed,newNode);
+                    this.addChild(passed,newNode, i);
 
                     //recursive call to fill the child
                     fillTree(newNode);
@@ -150,11 +127,22 @@ public class Tree implements Thing{
             passed.piece.setGameEnd(array.endState(atSpot));
             passed.piece.setIsGameEnd(true);
 
+            for(int i = 0; i < 7; i++){//delete leafs, we already know how this game turns out
+                if(passed.getChildAt(i) != null){
+                    deconstructLeaf(passed.getChildAt(i));
+                    passed.removeChild(passed.getChildAt(i));
+                }
+
+            }
+
         }
         //check passed's children for ending state
-        for(int i = 0; i< 7; i++){
-            if(passed.getChildAt(i) != null && !passed.getData().getIsGameEnd()){
-                assignEndingsOfTree(passed.getChildAt(i), array);
+        else{
+            for(int i = 0; i< 7; i++) {
+                if (passed.getChildAt(i) != null && !passed.getData().getIsGameEnd()) {
+                    assignEndingsOfTree(passed.getChildAt(i), array);
+                }
+
             }
         }
 
@@ -164,51 +152,71 @@ public class Tree implements Thing{
     private void weighTree(Node passed){
         int nextMove = -1; //maintains which move the entity will make based off the computed weights
 
-        //check if this game board leads to an end by itself
-        if(passed.piece.getIsGameEnd()) {
-            //if the game leads to a win and is the AIs turn OR the game leads to a loss and is the players turn
-            if ((passed.piece.getGameEnd() == 'w' && passed.piece.getHeight() % 2 == 0) ||
-                    (passed.piece.getGameEnd() == 'l' && passed.piece.getHeight() % 2 == 1)) {
-                //assign high weight to this move
-                passed.piece.setWeight(100);
-            }
-            //else if the game leads to a loss and is the AI's turn OR the game leads to a victory and is the players turn
-            else{
-                passed.piece.setWeight(-100);
-            }
+        //check if this game board leads to a win AND the game is  in wrap up mode
+        //NOTE:: Wrap up mode means the AI has already reached a winning game state and just needs to finish it off
+        //NOTE:: Perfect play from player One will never get the game out of wrap up mode
+        if (passed.piece.getGameEnd() == 'l' && passed.piece.board.wrapUpGame){
+            //assign high weight to this move
+            //passed.piece.setWeight(100);
         }
-        else{ //else we need to determine the weight from the subtrees
-            if(!passed.hasNoChildren()) {//there are children
-                int tempWeight = 0; //holds weight while calculating the parents weight
-                //loop through all children
-                for (int i = 0; i < 7; i++) {
+        //else if the game leads to a Player One (token x) Losing against the AI (token o) and the game is not in wrapUp mode
+        //NOTE::The AI will only pass this comparison if it represents a future move that can make the player lose
+        if (passed.piece.getGameEnd() == 'l'){
+            //assign high weight to this move
+            passed.piece.setWeight(100);
+        }
+        //else if the game leads to Player One Winning
+        //NOTE::The AI will only pass this comparison if it represents a future move that can make the player win
+        else if(passed.piece.getGameEnd() == 'w'){
+            passed.piece.setWeight(-100);
+        }
+        //else the game ends in a tie and is not being wrapped up
+        //NOTE::The AI will only pass this comparison if it represents a future move that can make the player draw
+        else if(passed.piece.getGameEnd() == 'd') {
+            passed.piece.setWeight(0);
+        }
+        else { //Since the game is not being wrapped up and the game state being tested is not an end game state, we need to delve further
+            //into subtrees to determine what moves from here will lead to possible game victories
+            if (!passed.hasNoChildren()) {//if this node has children
+
+                int tempLWeight = 999; //holds lowest weight while calculating the parents weight
+                int tempHWeight = -999; //holds highest weight while calculating the parents weight
+
+                for (int i = 0; i < 7; i++) {  //loop through all children
                     //check if the passed node has children at that spot and compute their weights first if so
                     if (passed.getChildAt(i) != null) {
                         //recursive call to compute weights (to see if any children lead to an end state)
                         weighTree(passed.getChildAt(i));
-                        if(passed.getHeight()%2 == 0) {//If passed represents the AI's move
-                            //The AI will want to pick the next move with the highest positive weight
-                            //and will never pick a subtree with a negative weight if it can help it
-                            if (passed.getChildAt(i).getData().getWeight() > tempWeight) {
+                        if (passed.getTurn()=="AI") {//If passed represents the AI's move
+                            //The AI will want to pick the next move with the lowest weight
+                            if (passed.getChildAt(i).getData().getWeight() < tempLWeight) {//If this child has the lowest weight out of the other subtrees so far
                                 nextMove = i;
-                                tempWeight = passed.getChildAt(i).getData().getWeight()/3;
+                                tempLWeight = passed.getChildAt(i).getData().getWeight() / 3;
                             }
                         }
                         else {//It must be the players turn. Assume they will always pick a move with
-                            //the lowest weight to the AI
-                            if(passed.getChildAt(i).getData().getWeight() > tempWeight) {
+                            //the highest weight to them
+                            if (passed.getChildAt(i).getData().getWeight() > tempHWeight) {//If this child has the highest weight out of the other subtrees so far
                                 nextMove = i;
-                                tempWeight = passed.getChildAt(i).getData().getWeight()/3;
+                                tempHWeight = passed.getChildAt(i).getData().getWeight() / 3;
                             }
                         }
                     }
                 }
+                //Now that we have computed all the weights of the Children and figured out which one has the lowest/highest respective weight
+                //(depending on weather this is a Player or AI turn)
+
                 //assign passed the new computed weight
-                passed.setWeight(tempWeight);
-                //remember the move so the AI know which move to make
+                if(passed.getTurn()=="AI"){
+                    passed.setWeight(tempLWeight);//Set the weight of this node to be the highest utility option, (lowest weight for the player)
+                }
+                else{
+                    passed.setWeight(tempHWeight);//Set the weight of this node to be the lowest utility option,
+                                                    // (highest weight, which you should assume the player will pick)
+                }
+                //remember the move so the AI know which move that represents
                 passed.getData().setNextMove(nextMove);
-            }
-            else {//there are no children, ,this is not a game end state, and there is nothing to compute
+            } else {//there are no children, ,this is not a game end state, and there is nothing to compute
                 //the weight will be left at 0
                 //passed.piece.printPiece();
                 return;
@@ -243,8 +251,13 @@ public class Tree implements Thing{
     public static int AILoop(gameState currentGame, dataArray gameStateArray){
         int toReturn = -1;
 
+        //If this game is and end game and the AI is winning
+        if(gameStateArray.isInArray(currentGame) != -1 && gameStateArray.endState(gameStateArray.isInArray(currentGame)) == 'l'){
+            currentGame.wrapUpGame = true;
+        }
+
         //This portion leads up to the end game state if we aren't already there
-        if(gameStateArray.isInArray(currentGame) != -1) { //if the current game isn't in an end game state
+        if(!currentGame.wrapUpGame) { //if the current game isn't in an end game state
             System.out.println("Creating Tree...");
             Tree decisionTree = new Tree(currentGame);
 
@@ -259,13 +272,39 @@ public class Tree implements Thing{
 
             System.out.println("Getting Next Optimal Move");
             toReturn = decisionTree.getNextMove(currentGame);
+            //decisionTree.PrintTree(decisionTree.getHead());
+            //decisionTree.printChildWeights(decisionTree.getHead());
+            decisionTree.printOptimalGamePath(decisionTree.getHead());
+            //decisionTree.dumpTree(decisionTree.getHead());
+
 
             System.out.println("Deleting Tree...");
-            decisionTree.deleteTree();
+            //decisionTree.deleteTree();
         }
-        else{ //The current game is in an end game state
+        else{ //The current game is in an end game state with us winning, lets bring home the bacon
+            System.out.println("Game is in end state " + gameStateArray.boardArray[gameStateArray.isInArray(currentGame)].end);
+        }
 
-        }
         return toReturn;
     }
-}
+
+    private void printChildWeights(Node passed){
+        for(int i = 0; i<7; i++){
+            if (passed.getChildAt(i) != null) {
+                System.out.println("Child " + i + " has weight " + passed.getChildAt(i).getData().getWeight());
+            }
+        }
+    }
+
+    public void dumpTree(Node passed){
+        System.out.println("Head is:");
+        passed.piece.printPiece();
+        for(int i = 0; i < 7; i++){
+            if(passed.getChildAt(i) != null){
+                System.out.println("Child " + i + " is:");
+                passed.getChildAt(i).piece.printPiece();
+            }
+            else
+                System.out.println("Child " + i + " is null");
+        }
+    }
