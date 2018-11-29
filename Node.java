@@ -7,25 +7,25 @@ public class Node implements Thing{
 
     //default and non-default constructor
     public Node(){
-        piece = new Piece();
-        children = new Node[7];
+        this.piece = new Piece();
+        this.children = new Node[7];
 
     }
 
     public Node(Piece pie){
         children = new Node[7];
         for(int i = 0; i < 7; i++){
-            children[i] = null;
+            this.children[i] = null;
         }
-        piece = pie;
+        this.piece = pie;
     }
 
     //getter and setter
     public void setData(Piece pie){
-        piece = pie;
+        this.piece = pie;
     }
     public Piece getData(){
-        return piece;
+        return this.piece;
     }
 
 
@@ -51,15 +51,13 @@ public class Node implements Thing{
     }
 
     //adds child to node, returns true if successful, false otherwise
-    public boolean addChild(Node item){
-        for(int i = 0; i < 7; i++){
-            if (children[i] == null || children[i].piece.checkIfEmpty()){
-                children[i] = item;
-                empty = false;
-                return true;
-            }
-        }
-        return false;
+    public boolean addChild(Node item, int spot){
+        this.children[spot] = item;
+        //children[spot].piece.printPiece();
+        return true;
+    }
+    public void removeChildAt(int i){
+        children[i] = null;
     }
 
     //tests to see if all children have data(not the entire subtree that each child may possess)
@@ -76,8 +74,8 @@ public class Node implements Thing{
     public boolean removeChild(Node item){
         for(int i = 0; i < 7; i++){
             if (children[i] == item){
-                children[i] = new Node();
-                empty = true;
+                children[i] = null; //in Java, making a pointer null will delete the object the pointer was pointing to
+                //empty = true;
                 return true;
             }
         }
@@ -97,8 +95,17 @@ public class Node implements Thing{
     }
 
     public void initializeLeaf(int i){
-        if(children[i] == null){
-            children[i] = new Node();
+        if(this.children[i] == null){
+            this.children[i] = new Node();
+        }
+    }
+
+    public String getTurn(){
+        if(this.piece.getHeight()%2 == 0){
+            return "AI";
+        }
+        else{
+            return "Player";
         }
     }
 
