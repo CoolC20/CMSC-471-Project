@@ -5,8 +5,6 @@ public class Piece implements Thing{
     private String color2;
     public gameState board;
     private int height, weight;
-    private boolean isGameEnd;
-    private char gameEnd;
     private int nextMove = -1;
 
     public Piece(){
@@ -18,18 +16,14 @@ public class Piece implements Thing{
         board = new gameState();
         height = 1;
         weight = 0;
-        isGameEnd = false;
-        gameEnd = 'n';
     }
     public Piece(int al, int bet, String col1, String col2, gameState newBoard, int newHeight){
-        alpha = al;
-        beta = bet;
-        color1 = col1;
-        color2 = col2;
-        board = newBoard;
-        height = newHeight;
-        isGameEnd = false;
-        gameEnd = 'n';
+        this.alpha = al;
+        this.beta = bet;
+        this.color1 = col1;
+        this.color2 = col2;
+        this.board = newBoard;
+        this.height = newHeight;
     }
     public int getAlpha(){
         return alpha;
@@ -42,12 +36,6 @@ public class Piece implements Thing{
     }
     public int getWeight(){
         return weight;
-    }
-    public boolean getIsGameEnd(){
-        return isGameEnd;
-    }
-    public char getGameEnd(){
-        return gameEnd;
     }
     public String getFirstColor(){
         return color1;
@@ -80,12 +68,6 @@ public class Piece implements Thing{
     public void setWeight(int wet){
         weight = wet;
     }
-    public void setIsGameEnd(boolean f){
-        isGameEnd = f;
-    }
-    public void setGameEnd(char end){
-        gameEnd = end;
-    }
     public void setBoard(gameState game){
         board = game;
     }
@@ -100,16 +82,16 @@ public class Piece implements Thing{
         else return false;
     }
     public void printPiece(){
-        System.out.format("%d is alpha, %d is beta, %s is color1, %s is color2, %d is height, %d is weight, ", alpha, beta, color1, color2, height, weight, nextMove);
-
-        System.out.print(nextMove + " is the next move the ");
+        System.out.format("%d is alpha, %d is beta, %s is color1, %s is color2, %d is height, %d is weight, %c is winner", alpha, beta, color1, color2, height, weight, board.getWinner());
+        System.out.print("\n" +nextMove + " is the next move the ");
         if(height%2 == 0){//Node represents AI's move
-            System.out.print("of the Player");
+            System.out.print(" of the Player");
         }
         else //Node represent the next move of the player
             System.out.print("of the AI");
         System.out.println();
         System.out.println("Game Board is:");
         board.printGameState();
+        System.out.println();
     }
 }
