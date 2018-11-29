@@ -1,3 +1,6 @@
+/////////////////////////
+//THIS CLASS IS NO LONGER USED IN ANY PART OF THE PROGRAM
+////////////////////////
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
