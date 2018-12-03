@@ -16,16 +16,21 @@ public class Board extends ConnectFour implements ActionListener{
 
     private JPanel panel1;
     private JPanel panel2;
+    private JFrame invalidFrame;
 
     private JFrame frame2;
     private JPanel panel3;
     private JLabel draw;
     int turn = 0;
 
+    private JLabel invalid;
+    private JPanel panel4;
+
     //Creating the initial board UI
     Board(){
           
         frame = new JFrame("Connect Four");
+        frame.setResizable(false);
         frame.setSize(700, 700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -85,6 +90,7 @@ public class Board extends ConnectFour implements ActionListener{
                     // When there are no spots in column invalid move message is displayed
                     if (placePiece < 0){
                         System.out.println("Invalid move!");
+                        invalidMove();
                         }
                         
                     // Place the piece in column
@@ -136,10 +142,10 @@ public class Board extends ConnectFour implements ActionListener{
             while (placePiece >= 0 && board1[placePiece][ai].getBackground() != Color.GREEN){
                 placePiece --;
             }
-
+ 
             board1[placePiece][ai].setBackground(Color.blue);
             board2[placePiece][ai] = "o";
-
+            
             // Check for AI win
             if (checkWin()){
                 winGame(board2[placePiece][ai]);
@@ -243,7 +249,7 @@ public class Board extends ConnectFour implements ActionListener{
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-        //Get board state
+    //Get board state
     public String[][] getBoard(String board[][]){
         for (int i = 0; i < y; i ++){
             for (int j = 0; j < x; j++){
@@ -252,6 +258,19 @@ public class Board extends ConnectFour implements ActionListener{
             System.out.println();
         }
         return board;
+    }
+
+    public void invalidMove(){
+
+        invalidFrame = new JFrame();
+        invalidFrame.setSize(300,400);
+        panel4 = new JPanel();
+        invalid = new JLabel("Invalid Move!");
+
+        panel4.add(invalid);
+        invalidFrame.add(panel4);
+        invalidFrame.setVisible(true);
+
     }
 
     public int computeAI(String[][] board2) {
