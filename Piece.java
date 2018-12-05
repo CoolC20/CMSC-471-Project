@@ -1,4 +1,4 @@
-public class Piece implements Thing{
+public class Piece{
     private int alpha;
     private int beta;
     private String color1;
