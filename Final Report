@@ -215,20 +215,23 @@ As a result, the program can bypass many subtrees and save computational time.\c
 
 Just as any game, Connect Four requires a board that visualizes the moves that are being made by both the 
 computer and the player.  For the user interface, we are using java Swing and AWT(Abstract Windowing Toolkit).  
-In order to create the game board, we are using an array of 42 JButtons formatted to accommodate a board that 
-consists of seven columns and 6 six rows.  These JButtons that represent the game board do not have action 
-listeners; so in the case that a player selects a position on the board, there will be no response to this action. 
+In order to create the game board, we are using a two- dimensional array that consists of 42 JButtons which are 
+formatted to accommodate a board that consists of six rows and seven columns.  These JButtons that represent 
+the game board do not have action listeners meaning that when they are clicked on there is no response. This 
+is because in a physical game of Connect Four the disks are placed in an opening atop the game board and fall 
+into the next available position.
 
 Above the board is an additional row of seven JButtons aligned with the existing columns. These buttons are to 
-be used by the player when placing their disks in the desired position.  The user interface has not yet been 
-completed, however, when one of the buttons on the top row are selected or the algorithm makes the next move,
- the position in which the disk is being added will become occupied.  If the column in which a disk is being 
- placed in is full, there will be a message indicating that that is an invalid move.
+be used by the player when placing their disks in the desired position.  When the player selects one of these buttons, 
+their piece will be placed in the corresponding column.  In order to indicate that their piece has been placed, the 
+background color of that position is then changed to be the color of the corresponding player. If the column in which 
+a disk is being placed in is full, there is a message which indicates that that is an invalid move. 
 
-Once the player makes their move, control of the board will be passed to the AI, which utilizes the minimax and 
-Alpha-beta algorithms to determine the next move that should be made. Once the AI has determined its move, it will 
-update the game board and pass control of the board back to the player. This process will continue until either 
-there is a winner or every position has been occupied, resulting in a draw. 
+Once the player makes their move, control of the board is passed to the AI, which utilizes the implemented algorithms 
+to determine the next move that should be made.  When the AI has determined its move, an integer is returned to select 
+which column to place a disk in, the game board is updated based on the value returned and the control of the game is 
+passed back to the player. This process will continue until either there is a winner or every position has been occupied, 
+resulting in a draw.  Once the game terminates a new window with text appears stating the game results.  
 
 \section{Actual Implementation of the Algorithms}
 \subsection{The Call to the AI}
