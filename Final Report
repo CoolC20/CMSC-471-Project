@@ -396,7 +396,17 @@ It also includes complexity estimates and mathematical formulas for every algori
 
 \subsection*{The Minimax Algorithm and Alpha-Beta Pruning}
 
-A simple web page detailing a brief history of the Mini-Max formula and its first use in programming. 
+The alpha-beta pruning is a specific case of the minimax algorithm that reduces the search time of the multiway tree. Each node in the 
+tree would have two scores, alpha and beta, that would represent the value of the move. Alpha represents a value associated with a move 
+favorited by the A.I. while beta represents a value associated with a move favorited by the user and therefore dangerous for the A.I.  
+A move that is more closely associated with a win state for the A.I. would have a high alpha value and a low beta value. A move that is 
+more closely associated with a win state for the user would have the opposite. As you add children to the tree that include different 
+permutations, these values would be updated based on whether there is a win state or not. A subtree containing a win state would have a 
+high alpha value in the parent node, it would also increase depending on how quickly the win state can be achieved. When looking at a 
+parent node's children, you would just have to find the child with the highest alpha value in order to determine which subtree contains 
+the optimal move. This reduces the search time finding the optimal move in the entire tree, seeing that you wouldn't have to check every
+single node in the entire tree, just one subtree. 
+ 
 
 % that's all folks
 \end{document}
