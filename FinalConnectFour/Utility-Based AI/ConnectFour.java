@@ -10,7 +10,7 @@ public class ConnectFour {
 
     // global used by seekMove to find the next optimal move
     // for the given player
-    int MAX_DEPTH = 7; // look-ahead depth used by recursive step to stop if
+    int MAX_DEPTH = 5; // look-ahead depth used by recursive step to stop if
                        // computation becomes too hardware intensive, this value
                        // is quite difficult to pin point for any given machine.
                        // values as low as 5 should be fine for any modern system,
@@ -217,11 +217,14 @@ public class ConnectFour {
         // figure out the next player to go similarly to the main method
         //
         int nextPlayer;
-                       
-        if(player % 2 == 0) {
-            nextPlayer = 1;
+        if (depth > 0) {             
+            if(player % 2 == 0) {
+                nextPlayer = 1;
+            } else {
+                nextPlayer = 2;
+            }
         } else {
-            nextPlayer = 2;
+            nextPlayer = player;
         }
 
         // maxScore and minScore values for the explored gamespace of the tree
@@ -267,6 +270,7 @@ public class ConnectFour {
         if(depth == MAX_DEPTH) {
            // column is -1 because the MAX_DEPTH has been reached for this
            // game space
+           // System.out.println("Terminal state of max depth reached with score: " + curScore);
            return new int [] {curScore, -1};
         }
 
@@ -319,7 +323,7 @@ public class ConnectFour {
         // return value based on the current player, values and scores are divided
         // by two so that deeper values are not preferred over shallower values
         // ie an optimal win 3 turns away should be better than a win 5 turns away
-        if(player % 2 == 0) {
+        if(player % 2 == 1) {
             return new int [] {(maxScore/2 + curScore/2), maxColumn};
         } else {
             return new int [] {(minScore/2 + curScore/2), minColumn};
@@ -1261,6 +1265,10 @@ public class ConnectFour {
             while (gameState == 1) {
                 // show the game board
                 game.print();
+                int [] tuple = game.seekDisjoints(game.gameBoard, 1);
+                int [] tuple2 = game.seekDisjoints(game.gameBoard, 2);
+                System.out.println("Player 1 - Ones: " + tuple[0] + " Twos: " + tuple[1] + " Threes: " + tuple[2]);
+                System.out.println("Player 2 - Ones: " + tuple2[0] + " Twos: " + tuple2[1] + " Threes: " + tuple2[2]);
 
                 // debugging stuff
                 //int [] tuple = game.seekDisjoints(game.gameBoard, 1);
