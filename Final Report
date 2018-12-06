@@ -153,7 +153,10 @@ when examining the true upperbound of 4.5 trillion computed permutations.
 
 \subsection{More on Minimax}
 
-The Mini-Max Algorithm was first created in 1958 for use in computer chess games as part of a larger 
+This algorithm originates from a theorem known as the minimax theorem which was proved by John von Neumann, an accomplished mathematician, physicist and computer scientist, in 1928.  This theorem first introduced the idea that in any given two player, zero-sum game with perfect information, there are strategies for each player that allows them to minimize their maximum losses.  It also showed that both players’ minimaxes are equal in absolute value and opposite in sign.  The original proof was underdeveloped and did not include any equations to be solved.  Sixteen years later, in 1944, von Neumann provided a completely new proof for this theorem where he had a full understanding of the mathematical context.  Once this theorem was established, it largely influenced the development of game theory which soon after became an active field of research.  
+
+
+The Mini-Max Algorithm was first implemented in 1958 for use in computer chess games as part of a larger 
 research interest in Artificial Intelligence. This AI created a tree detailing all possible moves by 
 using heuristics to determine what moves were legal. The tree was pruned using an Alpha-Beta algorithm 
 to keep complexity down and reduce the number of moves needed to explore.\cite{IEEEhowto:Min-MaxHistory}
