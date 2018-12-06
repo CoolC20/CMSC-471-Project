@@ -227,10 +227,37 @@ Alpha-beta algorithms to determine the next move that should be made. Once the A
 update the game board and pass control of the board back to the player. This process will continue until either 
 there is a winner or every position has been occupied, resulting in a draw. 
 
-% conference papers do not normally have an appendix
+\section{Actual Implementation of the Algorithms}
+\subsection{The Call to the AI}
+The User Interface makes a call to the AI with a function called 'AI Loop' immediately after the player places their piece. 
+This function call takes the current state of the board as a parameter and returns the column that AI shall place its' next piece. 
+The user interface handles the AI's move, then waits for the next move from the player.
 
-% use section* for acknowledgment
+The AI is actually implemented as the aforementioned min-max tree, and all computations and computer logic is handled in this class.
 
+\subsection{Implementation of the Tree}
+The 'Tree' class was designed to take in the current game board and use it as the root of the tree. It makes a recursive function call 
+to create the entirety of the tree from this root. From the root, it creates all next possible moves that the AI can place. From these 
+newly created roots, it makes every possible move the player can make. It will continue this pattern of recursion until it reaches the 
+specified depth.
+
+To help reduce computational time, every created node is checked to be a win condition before creating subtrees for it. If a created 
+node represents a win condition, creating subtrees from that node is unnecessary since the game will end if it ever reaches that game 
+state. 
+
+Once the tree is fully created, the AI will weigh all subtrees in a post-order traversal. This means the AI will weigh all subtrees of 
+a node in the tree before weighing the parent. The node will receive an initial positive weight if represents a win of the AI. 
+Similarly, if the node represents a loss for the AI, the node is set to an initial negative weight. 
+
+A parent node, because of the way we created the tree, must either be a terminal state have children. If the node has children, we 
+automatically know the weight of the tree must be determined by its' children. Depending on whose turn it is, the AI will either pick 
+the highest value of its' children to represent its' weight if it represents the AI's move and the AI want to maximize its' utility, or 
+it will pick the lowest weight of the children to represent the node since the node represents the players move and the player is 
+assumed to pick the next move with the most utility to him/herself. 
+
+The AI will also keep track of what move the entity made to reach the child's game state so that when it gets to the root, it knows 
+exactly what route the entire game will follow given perfect play from both entities. The value contained in the root is the value 
+passed back to the User Interface for the next move of the AI.
 \section{Final Results}
 
 \subsection{Creating an "easy" AI}
@@ -240,6 +267,31 @@ there is a winner or every position has been occupied, resulting in a draw.
 \subsection{Creating a "medium" AI}
 
 \subsection{Performance and Statistics}
+
+\section{Further improvements}
+\subsection{Attempts with a Data Set}
+The original design of the tree included a reference to a data set. This data set contained every game state in which perfect play 
+from an entity could force the other entity into a win. The plan was to reference every game state in the created tree against this 
+data set. This way, the AI could figure out which game states were better than others without having to fully traverse the depth of 
+tree. There are some issues that make this approach unfeasible at this stage of development.
+
+The data set contained an array of almost 68,000 game states. Originally, we stored these in a single array and searched through the 
+array linearly to determine if a given game state was in this array and what terminal state it led to if so. This proved to be an 
+issue, as it added an additional 68,000 comparisons to each node in the tree, meaning our tree could only work up to a depth of 5 
+before the computer would take too long to generate a result. A depth of 5 was tested and determined to be not enough look-ahead 
+ability of the AI to be good at winning games.
+
+The array could not be sorted easily, so our only option for cutting down this amount of comparisons was to store the data set in a 
+hash table to reduce search time to O(1). Unfortunately, with our time constraints, this was judged to be too much to implement before 
+the project deadline. 
+
+Additionally, it did not solve the most important requirement of the AI; to attempt to win the game. The AI was capable of getting to 
+a winning game state as determined by the data set if it was 5 turns or less in the future. Once it was there, the AI did not know how 
+to finish the game, especially if the forced win was more than 5 turns in advanced, meaning that it would not be able to see how it 
+could win from the winning game state and would pick its' move randomly instead, thus ruining the winning game state.
+
+This addition to the program is left as a possible improvement and has potential to drastically improve performance if implemented 
+correctly.
 
 \section{Conclusion}
 
