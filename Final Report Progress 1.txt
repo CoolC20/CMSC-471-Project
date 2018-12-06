@@ -352,6 +352,7 @@ strongly solve connect four (see our presentation for the usage of a fatal colum
 Now that there is some notion as to what the attributes use to evaluate a given board will be, the proposed method of calculating the score of
 the board is
 
+
 \begin{itemize}
 
 \item
@@ -359,9 +360,71 @@ $score(board, player) = player.num_ones * w\_ones + player.num\_twos * w\_twos +
 
 \end{itemize}
 
-\subsection{Performance and Statistics}
+\begin{table}[h]
+\centering
+\caption{Easy AI: 10000 games, lookahead = 5}
+\label{}
+\begin{tabular}{ll}
+\hline
+Type               & Value    \\ \hline
+Total Run Time     & 8:53     \\
+Avg. Time per Game & .053 s   \\
+Avg. Time per Turn & 1.287 ms \\
+Player 1 Win Rate: & .3263    \\
+Player 2 Win Rate: & .6007    \\
+Draw Rate:         & .073    
+\end{tabular}
+\end{table}
 
+\begin{table}[h]
+\centering
+\caption{Easy AI: 1000 games, lookahead = 7}
+\label{}
+\begin{tabular}{ll}
+\hline
+Type               & Value    \\ \hline
+Total Run Time     & 39:22    \\
+Avg. Time per Game & 2.363 s   \\
+Avg. Time per Turn & 78.051 ms \\
+Player 1 Win Rate: & .287    \\
+Player 2 Win Rate: & .629    \\
+Draw Rate:         & .084   
+\end{tabular}
+\end{table}
 
+\begin{table}[h]
+\centering
+\caption{Utility-based AI: 1000 games, lookahead = 5}
+\label{}
+\begin{tabular}{ll}
+\hline
+Type               & Value    \\ \hline
+Total Run Time     & 6:56     \\
+Avg. Time per Game & .416 s   \\
+Avg. Time per Turn & 18.039 ms \\
+Avg. Search Depth  & 4587.38   \\
+Player 1 Win Rate: & .632    \\
+Player 2 Win Rate: & .317    \\
+Draw Rate:         & .051     
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Utility-based AI: 100 games, lookahead = 7}
+\label{}
+\begin{tabular}{ll}
+\hline
+Type               & Value    \\ \hline
+Total Run Time     & 21:05     \\
+Avg. Time per Game & 12.65 s   \\
+Avg. Time per Turn & 580.54 ms \\
+Avg. Search Depth  & 155,534.44  \\
+Player 1 Win Rate: & .63    	\\
+Player 2 Win Rate: & .28    	\\
+Draw Rate:         & .09     
+\end{tabular}
+\end{table}
 
 \section{Further improvements}
 
@@ -448,9 +511,7 @@ Klesk, Przemyslaw, \emph{MIN-MAX algorithm — history, variants, refinements \LaT
 \emph{The Minimax Algorithm and Alpha-Beta Pruning}, Mastering The Game, A History Of Computer Chess
 \end{thebibliography}
 
-
 \section*{Reference Reviews}
-
 
 \subsection*{Numberphile}
 
@@ -512,7 +573,16 @@ It also includes complexity estimates and mathematical formulas for every algori
 
 \subsection*{The Minimax Algorithm and Alpha-Beta Pruning}
 
-A simple web page detailing a brief history of the Mini-Max formula and its first use in programming. 
+The alpha-beta pruning is a specific case of the minimax algorithm that reduces the search time of the multiway tree. Each node in the 
+tree would have two scores, alpha and beta, that would represent the value of the move. Alpha represents a value associated with a move 
+favorited by the A.I. while beta represents a value associated with a move favorited by the user and therefore dangerous for the A.I.  
+A move that is more closely associated with a win state for the A.I. would have a high alpha value and a low beta value. A move that is 
+more closely associated with a win state for the user would have the opposite. As you add children to the tree that include different 
+permutations, these values would be updated based on whether there is a win state or not. A subtree containing a win state would have a 
+high alpha value in the parent node, it would also increase depending on how quickly the win state can be achieved. When looking at a 
+parent node's children, you would just have to find the child with the highest alpha value in order to determine which subtree contains 
+the optimal move. This reduces the search time finding the optimal move in the entire tree, seeing that you wouldn't have to check every
+single node in the entire tree, just one subtree.
 
 % that's all folks
 \end{document}
